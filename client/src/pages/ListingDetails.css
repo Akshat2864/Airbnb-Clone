@@ -1,0 +1,90 @@
+
+.details-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 28px 5%;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #222;
+  text-decoration: underline;
+}
+
+.details-container h1 {
+  margin: 0 0 8px;
+  font-size: clamp(25px, 4vw, 34px);
+}
+
+.details-location {
+  margin-bottom: 22px;
+  color: #555;
+}
+
+.details-image {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+  border-radius: 16px;
+  background: #eee;
+}
+
+.details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 40px;
+  margin-top: 28px;
+}
+
+.details-description p {
+  line-height: 1.7;
+  color: #555;
+}
+
+.booking-preview {
+  align-self: start;
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px #00000008;
+}
+
+.booking-preview h2 {
+  margin-top: 0;
+}
+
+.booking-preview h2 span {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.reserve-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #ff385c;
+  color: white;
+  font-weight: 700;
+}
+
+.reserve-button:hover {
+  background: #e31c5f;
+}
+
+.details-message {
+  padding: 40px 5%;
+}
+
+@media (max-width: 700px) {
+  .details-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .details-image {
+    max-height: 350px;
+  }
+}
