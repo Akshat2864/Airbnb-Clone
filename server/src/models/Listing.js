@@ -33,6 +33,11 @@ const listingSchema = new mongoose.Schema(
       type: String,
       default: "Amazing views",
     },
+    owner: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
+},
   },
   { timestamps: true }
 );
