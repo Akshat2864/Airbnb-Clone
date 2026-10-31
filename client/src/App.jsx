@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router";
 
@@ -7,16 +6,27 @@ import CategoryFilter from "./components/CategoryFilter";
 import ListingCard from "./components/ListingCard";
 import ListingDetails from "./pages/ListingDetails";
 import { getListings } from "./services/listingService";
-
+import { useAuth } from "./context/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import CreateListing from "./pages/CreateListing";
+import MyListings from "./pages/MyListings"
 import "./App.css";
+import EditListing from "./pages/EditListing";
 
 function Home() {
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
+
+  console.log("Auth Loading:", authLoading);
+  console.log("Authenticated:", isAuthenticated);
+  console.log("Current User:", user);
+
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("All stays");
+  const [selectedCategory, setSelectedCategory] = useState("All stays");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -35,7 +45,7 @@ function Home() {
       } catch (error) {
         setError(
           error.response?.data?.message ||
-          "Unable to load listings. Please try again."
+            "Unable to load listings. Please try again.",
         );
       } finally {
         setLoading(false);
@@ -52,13 +62,10 @@ function Home() {
       listing.title,
       listing.location,
       listing.country,
-    ].some((value) =>
-      value?.toLowerCase().includes(searchText)
-    );
+    ].some((value) => value?.toLowerCase().includes(searchText));
 
     const matchesCategory =
-      selectedCategory === "All stays" ||
-      listing.category === selectedCategory;
+      selectedCategory === "All stays" || listing.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -88,9 +95,7 @@ function Home() {
 
           {loading && <p>Loading stays...</p>}
 
-          {!loading && error && (
-            <p className="error-message">{error}</p>
-          )}
+          {!loading && error && <p className="error-message">{error}</p>}
 
           {!loading && !error && filteredListings.length === 0 && (
             <p>No stays found. Try another search or category.</p>
@@ -99,10 +104,7 @@ function Home() {
           {!loading && !error && filteredListings.length > 0 && (
             <div className="listing-grid">
               {filteredListings.map((listing) => (
-                <ListingCard
-                  key={listing._id}
-                  listing={listing}
-                />
+                <ListingCard key={listing._id} listing={listing} />
               ))}
             </div>
           )}
@@ -116,10 +118,16 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route
-        path="/listings/:id"
-        element={<ListingDetails />}
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/listings/:id" element={<ListingDetails />} />
+
+     
+      <Route element={<ProtectedRoute />}>
+        <Route path="/listings/new" element={<CreateListing />} />
+        <Route path="/listings/:id/edit" element={<EditListing/>}/>
+        <Route path="/my-listings" element={<MyListings/>}/>
+      </Route>
     </Routes>
   );
 }

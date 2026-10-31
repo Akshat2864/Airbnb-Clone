@@ -29,6 +29,29 @@ router.get("/", async (req, res) => {
 });
 
 
+// GET /api/listings/my-listings
+// Fetch listings created by the logged-in user
+
+router.get("/my-listings", isAuthenticated, async (req, res) => {
+  try {
+    const listings = await Listing.find({
+      owner: req.session.userId,
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: listings.length,
+      data: listings,
+    });
+  } catch (error) {
+    console.error("Fetch my listings error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch your listings",
+    });
+  }
+});
 
 // GET /api/listings/:id
 router.get("/:id", async (req, res) => {
@@ -270,6 +293,8 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
     });
   }
 });
+
+
 
 
 module.exports = router;

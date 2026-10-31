@@ -1,0 +1,8 @@
+.page-loading {
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #717171;
+}
