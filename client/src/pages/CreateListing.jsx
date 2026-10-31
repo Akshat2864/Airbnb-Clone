@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { createListing } from "../services/listingService";
 import "./CreateListing.css";
+import {uploadImage} from "../services/uploadService"
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ export default function CreateListing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [imageFile, setImageFile] = useState(null);
+const [imagePreview, setImagePreview] = useState("");
+const [uploading, setUploading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -30,29 +35,75 @@ export default function CreateListing() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setError("");
-    setLoading(true);
+  setError("");
 
-    try {
-      const response = await createListing({
-        ...formData,
-        price: Number(formData.price),
-      });
+  if (!imageFile) {
+    setError("Please select a property image");
+    return;
+  }
 
-      if (response.success) {
-        navigate(`/listings/${response.data._id}`);
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      console.error("Create listing error:", error);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setUploading(true);
+
+  try {
+    // First upload image to ImageKit
+    const uploadResponse = await uploadImage(imageFile);
+
+    if (!uploadResponse.success) {
+      setError(uploadResponse.message);
+      return;
     }
-  };
+
+    setUploading(false);
+
+    // Get ImageKit URL
+    const imageUrl = uploadResponse.data.url;
+
+    // Create listing with uploaded image URL
+    const response = await createListing({
+      ...formData,
+      image: imageUrl,
+      price: Number(formData.price),
+    });
+
+    if (response.success) {
+      navigate(`/listings/${response.data._id}`);
+    } else {
+      setError(response.message);
+    }
+  } catch (error) {
+    console.error("Create listing error:", error);
+    setError("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+    setUploading(false);
+  }
+};
+
+
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  // Validate file type
+  if (!file.type.startsWith("image/")) {
+    setError("Please select a valid image");
+    return;
+  }
+
+  // Maximum file size: 5 MB
+  if (file.size > 5 * 1024 * 1024) {
+    setError("Image size must be less than 5 MB");
+    return;
+  }
+
+  setError("");
+  setImageFile(file);
+  setImagePreview(URL.createObjectURL(file));
+};
 
   return (
     <main className="create-listing-container">
@@ -91,18 +142,24 @@ export default function CreateListing() {
         </div>
 
         <div className="listing-form-group">
-          <label htmlFor="image">Image URL</label>
-          <input
-            id="image"
-            type="url"
-            name="image"
-            placeholder="https://example.com/property.jpg"
-            value={formData.image}
-            onChange={handleChange}
-            required
-          />
-          <small>For now, use a publicly accessible image URL.</small>
-        </div>
+  <label htmlFor="image">Property Image</label>
+
+  <input
+    type="file"
+    id="image"
+    accept="image/*"
+    onChange={handleImageChange}
+    required
+  />
+
+  <small>Upload a property image (maximum 5 MB).</small>
+</div>
+
+{imagePreview && (
+  <div className="listing-image-preview">
+    <img src={imagePreview} alt="Property preview" />
+  </div>
+)}
 
         {formData.image && (
           <div className="listing-image-preview">
@@ -173,12 +230,16 @@ export default function CreateListing() {
         </div>
 
         <button
-          className="create-listing-submit"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Creating listing..." : "Publish listing"}
-        </button>
+  className="create-listing-submit"
+  type="submit"
+  disabled={loading}
+>
+  {uploading
+    ? "Uploading image..."
+    : loading
+      ? "Creating listing..."
+      : "Publish listing"}
+</button>
       </form>
     </main>
   );

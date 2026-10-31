@@ -6,6 +6,7 @@ const { MongoStore } = require("connect-mongo");
 const authRoutes = require("./src/routes/authRoutes");
 require("dotenv").config();
 const listingRoutes = require("./src/routes/listingRoutes");
+const uploadRoutes = require("./src/routes/uploadRoutes");
 
 const app = express();
 
@@ -43,6 +44,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 
 app.use("/api/listings", listingRoutes);
+
+app.use("/api/upload", uploadRoutes)
 
 app.get("/", (req, res) => {
   res.json({ message: "Airbnb Clone API is running!" });

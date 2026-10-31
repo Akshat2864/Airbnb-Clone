@@ -5,6 +5,7 @@ import {
   getListingById,
   updateListing,
 } from "../services/listingService";
+import { uploadImage } from "../services/uploadService";
 import "./CreateListing.css";
 
 export default function EditListing() {
@@ -21,8 +22,12 @@ export default function EditListing() {
     category: "Amazing views",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   // Fetch existing listing details
@@ -65,6 +70,27 @@ export default function EditListing() {
     }));
   };
 
+  // Handle replacement image
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5 MB");
+      return;
+    }
+
+    setError("");
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -72,8 +98,27 @@ export default function EditListing() {
     setSaving(true);
 
     try {
+      // Keep the existing image unless a replacement is selected
+      let imageUrl = formData.image;
+
+      if (imageFile) {
+        setUploading(true);
+
+        const uploadResponse = await uploadImage(imageFile);
+
+        if (!uploadResponse.success) {
+          setError(uploadResponse.message);
+          return;
+        }
+
+        imageUrl = uploadResponse.data.url;
+      }
+
+      setUploading(false);
+
       const response = await updateListing(id, {
         ...formData,
+        image: imageUrl,
         price: Number(formData.price),
       });
 
@@ -87,6 +132,7 @@ export default function EditListing() {
       setError("Something went wrong. Please try again.");
     } finally {
       setSaving(false);
+      setUploading(false);
     }
   };
 
@@ -136,20 +182,22 @@ export default function EditListing() {
         </div>
 
         <div className="listing-form-group">
-          <label htmlFor="image">Image URL</label>
+          <label htmlFor="image">Replace property image (optional)</label>
           <input
             id="image"
-            type="url"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            required
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
           />
+          <small>Upload a new image only if you want to replace the existing one. Maximum 5 MB.</small>
         </div>
 
-        {formData.image && (
+        {(imagePreview || formData.image) && (
           <div className="listing-image-preview">
-            <img src={formData.image} alt="Property preview" />
+            <img
+              src={imagePreview || formData.image}
+              alt="Property preview"
+            />
           </div>
         )}
 
@@ -214,7 +262,11 @@ export default function EditListing() {
           type="submit"
           disabled={saving}
         >
-          {saving ? "Saving changes..." : "Save changes"}
+          {uploading
+            ? "Uploading image..."
+            : saving
+              ? "Saving changes..."
+              : "Save changes"}
         </button>
       </form>
     </main>
