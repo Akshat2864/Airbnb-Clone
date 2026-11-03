@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -43,19 +44,23 @@ export default function Navbar() {
       </div>
 
       <div className="nav-actions">
-        <Link to="/listings/new" className="host-button">
-          Become a host
-        </Link>
-
         {!loading &&
           (isAuthenticated ? (
             <>
+              <Link to="/listings/new" className="host-button">
+                Become a host
+              </Link>
+
               <span className="nav-user">Hi, {user.name}</span>
 
               <Link to="/my-listings" className="nav-auth-link">
                 My Listings
               </Link>
-              
+
+              <Link to="/my-bookings" className="nav-auth-link">
+                My Bookings
+              </Link>
+
               <button
                 className="profile-button"
                 onClick={handleLogout}
@@ -66,6 +71,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Link to="/listings/new" className="host-button">
+                Become a host
+              </Link>
+
               <Link to="/login" className="nav-auth-link">
                 Login
               </Link>

@@ -88,3 +88,55 @@
     max-height: 350px;
   }
 }
+
+
+.booking-preview form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.booking-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.booking-form-group label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.booking-form-group input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.booking-price-summary {
+  padding: 15px 0;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.booking-price-summary p {
+  margin-bottom: 8px;
+}
+
+.booking-price-summary h3 {
+  margin: 0;
+}
+
+.booking-success {
+  color: #15803d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reserve-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

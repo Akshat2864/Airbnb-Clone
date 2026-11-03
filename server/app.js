@@ -7,6 +7,7 @@ const authRoutes = require("./src/routes/authRoutes");
 require("dotenv").config();
 const listingRoutes = require("./src/routes/listingRoutes");
 const uploadRoutes = require("./src/routes/uploadRoutes");
+const bookingRoutes = require("./src/routes/bookingRoutes");
 
 const app = express();
 
@@ -46,6 +47,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 
 app.use("/api/upload", uploadRoutes)
+
+app.use("/api/bookings", bookingRoutes)
 
 app.get("/", (req, res) => {
   res.json({ message: "Airbnb Clone API is running!" });

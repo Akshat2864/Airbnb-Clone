@@ -11,9 +11,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateListing from "./pages/CreateListing";
-import MyListings from "./pages/MyListings"
+import MyListings from "./pages/MyListings";
 import "./App.css";
 import EditListing from "./pages/EditListing";
+import MyBookings from "./pages/MyBookings";
 
 function Home() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -27,6 +28,10 @@ function Home() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All stays");
+
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -55,20 +60,41 @@ function Home() {
     fetchListings();
   }, []);
 
-  const filteredListings = listings.filter((listing) => {
-    const searchText = search.toLowerCase().trim();
+  const filteredListings = listings
+    .filter((listing) => {
+      const searchText = search.toLowerCase().trim();
 
-    const matchesSearch = [
-      listing.title,
-      listing.location,
-      listing.country,
-    ].some((value) => value?.toLowerCase().includes(searchText));
+      const matchesSearch = [
+        listing.title,
+        listing.location,
+        listing.country,
+      ].some((value) => value?.toLowerCase().includes(searchText));
 
-    const matchesCategory =
-      selectedCategory === "All stays" || listing.category === selectedCategory;
+      const matchesCategory =
+        selectedCategory === "All stays" ||
+        listing.category === selectedCategory;
 
-    return matchesSearch && matchesCategory;
-  });
+      const matchesMinPrice =
+        minPrice === "" || listing.price >= Number(minPrice);
+
+      const matchesMaxPrice =
+        maxPrice === "" || listing.price <= Number(maxPrice);
+
+      return (
+        matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "low-to-high") {
+        return a.price - b.price;
+      }
+
+      if (sortBy === "high-to-low") {
+        return b.price - a.price;
+      }
+
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
   return (
     <>
@@ -83,6 +109,31 @@ function Home() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
+
+          <input
+            type="number"
+            placeholder="Min price"
+            min="0"
+            value={minPrice}
+            onChange={(event) => setMinPrice(event.target.value)}
+          />
+
+          <input
+            type="number"
+            placeholder="Max price"
+            min="0"
+            value={maxPrice}
+            onChange={(event) => setMaxPrice(event.target.value)}
+          />
+
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value)}
+          >
+            <option value="newest">Newest first</option>
+            <option value="low-to-high">Price: Low to High</option>
+            <option value="high-to-low">Price: High to Low</option>
+          </select>
         </div>
 
         <CategoryFilter
@@ -122,11 +173,11 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/listings/:id" element={<ListingDetails />} />
 
-     
       <Route element={<ProtectedRoute />}>
         <Route path="/listings/new" element={<CreateListing />} />
-        <Route path="/listings/:id/edit" element={<EditListing/>}/>
-        <Route path="/my-listings" element={<MyListings/>}/>
+        <Route path="/listings/:id/edit" element={<EditListing />} />
+        <Route path="/my-listings" element={<MyListings />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
       </Route>
     </Routes>
   );

@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { getMyListings, deleteListing } from "../services/listingService";
 import "./MyListings.css";
-
 
 export default function MyListings() {
   const [listings, setListings] = useState([]);
@@ -41,32 +39,30 @@ export default function MyListings() {
   }
 
   const handleDelete = async (id) => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this listing?"
-  );
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this listing?",
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  setDeletingId(id);
-  setError("");
+    setDeletingId(id);
+    setError("");
 
-  try {
-    const response = await deleteListing(id);
+    try {
+      const response = await deleteListing(id);
 
-    if (response.success) {
-      setListings((prev) =>
-        prev.filter((listing) => listing._id !== id)
-      );
-    } else {
-      setError(response.message);
+      if (response.success) {
+        setListings((prev) => prev.filter((listing) => listing._id !== id));
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      console.error("Delete listing error:", error);
+      setError("Failed to delete listing. Please try again.");
+    } finally {
+      setDeletingId(null);
     }
-  } catch (error) {
-    console.error("Delete listing error:", error);
-    setError("Failed to delete listing. Please try again.");
-  } finally {
-    setDeletingId(null);
-  }
-};
+  };
 
   return (
     <main className="my-listings-container">
@@ -92,7 +88,8 @@ export default function MyListings() {
       ) : (
         <>
           <p className="listing-count">
-            {listings.length} {listings.length === 1 ? "property" : "properties"}
+            {listings.length}{" "}
+            {listings.length === 1 ? "property" : "properties"}
           </p>
 
           <div className="my-listings-grid">
@@ -132,12 +129,12 @@ export default function MyListings() {
                       Edit
                     </Link>
                     <button
-  className="delete-listing-button"
-  onClick={() => handleDelete(listing._id)}
-  disabled={deletingId === listing._id}
->
-  {deletingId === listing._id ? "Deleting..." : "Delete"}
-</button>
+                      className="delete-listing-button"
+                      onClick={() => handleDelete(listing._id)}
+                      disabled={deletingId === listing._id}
+                    >
+                      {deletingId === listing._id ? "Deleting..." : "Delete"}
+                    </button>
                   </div>
                 </div>
               </article>
