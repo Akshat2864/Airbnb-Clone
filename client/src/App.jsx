@@ -15,6 +15,7 @@ import MyListings from "./pages/MyListings";
 import "./App.css";
 import EditListing from "./pages/EditListing";
 import MyBookings from "./pages/MyBookings";
+import MyWishlist from "./pages/MyWishlist";
 
 function Home() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -178,6 +179,7 @@ function App() {
         <Route path="/listings/:id/edit" element={<EditListing />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/my-wishlist" element={<MyWishlist />} />
       </Route>
     </Routes>
   );

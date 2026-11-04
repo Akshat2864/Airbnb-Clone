@@ -61,6 +61,10 @@ export default function Navbar() {
                 My Bookings
               </Link>
 
+              <Link to="/my-wishlist" className="nav-auth-link">
+  Wishlist ♥
+</Link>
+
               <button
                 className="profile-button"
                 onClick={handleLogout}
