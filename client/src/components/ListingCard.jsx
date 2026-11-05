@@ -7,6 +7,7 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "../services/wishlistService";
+import {getReviews } from "../services/reviewService";
 
 export default function ListingCard({ listing }) {
   const navigate = useNavigate();
@@ -14,6 +15,9 @@ export default function ListingCard({ listing }) {
 
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const [averageRating, setAverageRating] = useState(0);
+const [reviewCount, setReviewCount] = useState(0);
 
   // Check whether this listing is already saved
   useEffect(() => {
@@ -60,6 +64,20 @@ export default function ListingCard({ listing }) {
     }
   };
 
+
+  useEffect(() => {
+  const fetchRating = async () => {
+    const response = await getReviews(listing._id);
+
+    if (response.success) {
+      setAverageRating(response.averageRating);
+      setReviewCount(response.count);
+    }
+  };
+
+  fetchRating();
+}, [listing._id]);
+
   return (
     <article className="listing-card">
       <div className="listing-image-wrapper">
@@ -91,7 +109,12 @@ export default function ListingCard({ listing }) {
           <h3>
             {listing.location}, {listing.country}
           </h3>
-          <span>★ 4.9</span>
+          <span className="listing-rating">
+  ★ {reviewCount > 0 ? averageRating.toFixed(1) : "New"}
+  {reviewCount > 0 && (
+    <small> ({reviewCount})</small>
+  )}
+</span>
         </div>
 
         <Link

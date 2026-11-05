@@ -9,6 +9,7 @@ const listingRoutes = require("./src/routes/listingRoutes");
 const uploadRoutes = require("./src/routes/uploadRoutes");
 const bookingRoutes = require("./src/routes/bookingRoutes");
 const wishlistRoutes = require("./src/routes/wishlistRoutes");
+const reviewRoutes = require("./src/routes/reviewRoutes");
 
 const app = express();
 
@@ -53,6 +54,8 @@ app.use("/api/bookings", bookingRoutes)
 
 app.use("/api/wishlist", wishlistRoutes);
 
+app.use("/api/reviews", reviewRoutes);
+
 app.get("/", (req, res) => {
   res.json({ message: "Airbnb Clone API is running!" });
 });
@@ -72,5 +75,4 @@ async function startServer() {
     process.exit(1);
   }
 }
-
 startServer();
