@@ -3,6 +3,7 @@ const express = require("express");
 const Listing = require("../models/Listing");
 const mongoose = require("mongoose");
 const isAuthenticated = require("../middleware/isAuthenticated")
+const geocodeAddress = require("../services/geocoding.service");
 
 const router = express.Router();
 
@@ -102,6 +103,7 @@ router.post("/", isAuthenticated, async (req, res) => {
       location,
       country,
       category,
+      address,
     } = req.body;
 
     // Validate required fields
@@ -111,7 +113,9 @@ router.post("/", isAuthenticated, async (req, res) => {
       !image ||
       price === undefined ||
       !location ||
-      !country
+      !country ||
+      !address ||
+      !category
     ) {
       return res.status(400).json({
         success: false,
@@ -119,10 +123,25 @@ router.post("/", isAuthenticated, async (req, res) => {
       });
     }
 
+    // Validate price
     if (!Number.isFinite(Number(price)) || Number(price) < 0) {
       return res.status(400).json({
         success: false,
         message: "Price must be a valid non-negative number",
+      });
+    }
+
+    // Convert address into coordinates
+    const coordinates = await geocodeAddress(
+      address,
+      location,
+      country
+    );
+
+    if (!coordinates) {
+      return res.status(400).json({
+        success: false,
+        message: "Address not found. Please enter a valid address.",
       });
     }
 
@@ -134,6 +153,8 @@ router.post("/", isAuthenticated, async (req, res) => {
       price: Number(price),
       location,
       country,
+      address,
+      coordinates,
       category,
       owner: req.session.userId,
     });

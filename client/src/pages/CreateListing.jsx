@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { createListing } from "../services/listingService";
 import "./CreateListing.css";
-import {uploadImage} from "../services/uploadService"
+import { uploadImage } from "../services/uploadService";
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -15,6 +14,7 @@ export default function CreateListing() {
     price: "",
     location: "",
     country: "",
+    address: "",
     category: "Amazing views",
   });
 
@@ -22,8 +22,8 @@ export default function CreateListing() {
   const [error, setError] = useState("");
 
   const [imageFile, setImageFile] = useState(null);
-const [imagePreview, setImagePreview] = useState("");
-const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,75 +35,74 @@ const [uploading, setUploading] = useState(false);
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setError("");
+    setError("");
 
-  if (!imageFile) {
-    setError("Please select a property image");
-    return;
-  }
-
-  setLoading(true);
-  setUploading(true);
-
-  try {
-    // First upload image to ImageKit
-    const uploadResponse = await uploadImage(imageFile);
-
-    if (!uploadResponse.success) {
-      setError(uploadResponse.message);
+    if (!imageFile) {
+      setError("Please select a property image");
       return;
     }
 
-    setUploading(false);
+    setLoading(true);
+    setUploading(true);
 
-    // Get ImageKit URL
-    const imageUrl = uploadResponse.data.url;
+    try {
+      // First upload image to ImageKit
+      const uploadResponse = await uploadImage(imageFile);
 
-    // Create listing with uploaded image URL
-    const response = await createListing({
-      ...formData,
-      image: imageUrl,
-      price: Number(formData.price),
-    });
+      if (!uploadResponse.success) {
+        setError(uploadResponse.message);
+        return;
+      }
 
-    if (response.success) {
-      navigate(`/listings/${response.data._id}`);
-    } else {
-      setError(response.message);
+      setUploading(false);
+
+      // Get ImageKit URL
+      const imageUrl = uploadResponse.data.url;
+
+      // Create listing with uploaded image URL
+      const response = await createListing({
+        ...formData,
+        image: imageUrl,
+        price: Number(formData.price),
+      });
+
+      if (response.success) {
+        navigate(`/listings/${response.data._id}`);
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      console.error("Create listing error:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+      setUploading(false);
     }
-  } catch (error) {
-    console.error("Create listing error:", error);
-    setError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-    setUploading(false);
-  }
-};
-
+  };
 
   const handleImageChange = (e) => {
-  const file = e.target.files[0];
+    const file = e.target.files[0];
 
-  if (!file) return;
+    if (!file) return;
 
-  // Validate file type
-  if (!file.type.startsWith("image/")) {
-    setError("Please select a valid image");
-    return;
-  }
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image");
+      return;
+    }
 
-  // Maximum file size: 5 MB
-  if (file.size > 5 * 1024 * 1024) {
-    setError("Image size must be less than 5 MB");
-    return;
-  }
+    // Maximum file size: 5 MB
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5 MB");
+      return;
+    }
 
-  setError("");
-  setImageFile(file);
-  setImagePreview(URL.createObjectURL(file));
-};
+    setError("");
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   return (
     <main className="create-listing-container">
@@ -113,7 +112,11 @@ const [uploading, setUploading] = useState(false);
       </div>
 
       <form className="create-listing-form" onSubmit={handleSubmit}>
-        {error && <p className="form-error" role="alert">{error}</p>}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <div className="listing-form-group">
           <label htmlFor="title">Property title</label>
@@ -142,24 +145,24 @@ const [uploading, setUploading] = useState(false);
         </div>
 
         <div className="listing-form-group">
-  <label htmlFor="image">Property Image</label>
+          <label htmlFor="image">Property Image</label>
 
-  <input
-    type="file"
-    id="image"
-    accept="image/*"
-    onChange={handleImageChange}
-    required
-  />
+          <input
+            type="file"
+            id="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            required
+          />
 
-  <small>Upload a property image (maximum 5 MB).</small>
-</div>
+          <small>Upload a property image (maximum 5 MB).</small>
+        </div>
 
-{imagePreview && (
-  <div className="listing-image-preview">
-    <img src={imagePreview} alt="Property preview" />
-  </div>
-)}
+        {imagePreview && (
+          <div className="listing-image-preview">
+            <img src={imagePreview} alt="Property preview" />
+          </div>
+        )}
 
         {formData.image && (
           <div className="listing-image-preview">
@@ -216,6 +219,22 @@ const [uploading, setUploading] = useState(false);
           </div>
 
           <div className="listing-form-group">
+            <label htmlFor="address">Full Property Address</label>
+            <input
+              id="address"
+              type="text"
+              name="address"
+              placeholder="Street, area, landmark, postal code"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
+            <small>
+              Enter the complete property address to locate it on the map.
+            </small>
+          </div>
+
+          <div className="listing-form-group">
             <label htmlFor="country">Country</label>
             <input
               id="country"
@@ -230,16 +249,16 @@ const [uploading, setUploading] = useState(false);
         </div>
 
         <button
-  className="create-listing-submit"
-  type="submit"
-  disabled={loading}
->
-  {uploading
-    ? "Uploading image..."
-    : loading
-      ? "Creating listing..."
-      : "Publish listing"}
-</button>
+          className="create-listing-submit"
+          type="submit"
+          disabled={loading}
+        >
+          {uploading
+            ? "Uploading image..."
+            : loading
+              ? "Creating listing..."
+              : "Publish listing"}
+        </button>
       </form>
     </main>
   );

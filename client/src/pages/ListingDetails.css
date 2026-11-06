@@ -327,3 +327,15 @@
     flex-direction: column;
   }
 }
+.listing-map-section {
+  margin: 40px 0;
+}
+
+.listing-map-section h2 {
+  margin-bottom: 12px;
+}
+
+.listing-map-section p {
+  margin-bottom: 20px;
+  color: #717171;
+}

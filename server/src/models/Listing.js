@@ -29,6 +29,21 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    address: {
+  type: String,
+  required: true,
+  trim: true,
+},
+coordinates: {
+  lat: {
+    type: Number,
+    required: true,
+  },
+  lng: {
+    type: Number,
+    required: true,
+  },
+},
     category: {
       type: String,
       default: "Amazing views",
@@ -38,6 +53,7 @@ const listingSchema = new mongoose.Schema(
   ref: "User",
   required: true,
 },
+
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import "leaflet/dist/leaflet.css";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

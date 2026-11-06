@@ -11,6 +11,7 @@ import {
 } from "../services/reviewService";
 import { useAuth } from "../context/AuthContext";
 import "./ListingDetails.css";
+import ListingMap from "../components/ListingMap";
 
 export default function ListingDetails() {
   const { id } = useParams();
@@ -412,6 +413,21 @@ export default function ListingDetails() {
           </form>
         </aside>
       </div>
+
+      {/* Property Location */}
+<section className="listing-map-section">
+  <h2>Where you'll be</h2>
+
+  <p className="details-location">
+    {listing.address}, {listing.location}, {listing.country}
+  </p>
+
+  <ListingMap
+    coordinates={listing.coordinates}
+    title={listing.title}
+    address={listing.address}
+  />
+</section>
 
       {/* Reviews section */}
       <section className="reviews-section">
