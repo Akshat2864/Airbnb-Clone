@@ -20,6 +20,11 @@ app.use(
   }),
 );
 
+app.use(
+  "/api/bookings/webhook",
+  express.raw({ type: "application/json" })
+);
+
 app.use(express.json());
 
 app.use(
@@ -69,6 +74,7 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
+      
     });
   } catch (error) {
     console.error("Failed to start:", error.message);

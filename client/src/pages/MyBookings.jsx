@@ -13,6 +13,36 @@ export default function MyBookings() {
   const [error, setError] = useState("");
   const [cancellingId, setCancellingId] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+const bookingsPerPage = 5;
+
+const totalPages = Math.ceil(bookings.length / bookingsPerPage);
+
+const startIndex = (currentPage - 1) * bookingsPerPage;
+
+useEffect(() => {
+  if (currentPage > totalPages && currentPage > 1) {
+    setCurrentPage(totalPages);
+  }
+}, [currentPage, totalPages]);
+
+const currentBookings = bookings.slice(
+  startIndex,
+  startIndex + bookingsPerPage
+);
+
+
+  const totalBookings = bookings.length;
+
+const confirmedBookings = bookings.filter(
+  (booking) => booking.status === "confirmed"
+).length;
+
+const cancelledBookings = bookings.filter(
+  (booking) => booking.status === "cancelled"
+).length;
+
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -51,8 +81,8 @@ export default function MyBookings() {
         setBookings((prev) =>
           prev.map((booking) =>
             booking._id === bookingId
-              ? { ...booking, status: "cancelled" }
-              : booking
+               ? { ...booking, ...response.data }
+      : booking
           )
         );
       } else {
@@ -74,6 +104,12 @@ export default function MyBookings() {
     });
   };
 
+  const formatStatus = (status) => {
+  if (!status) return "N/A";
+
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
   if (loading) {
     return (
       <div className="my-bookings-status">
@@ -85,10 +121,28 @@ export default function MyBookings() {
   return (
     <main className="my-bookings-container">
       <div className="my-bookings-header">
+        
+      
         <div>
           <h1>My Bookings</h1>
           <p>Manage your upcoming and previous stays.</p>
         </div>
+        <div className="booking-summary">
+  <div className="summary-card">
+    <span>Total Bookings</span>
+    <h2>{totalBookings}</h2>
+  </div>
+
+  <div className="summary-card">
+    <span>Confirmed Stays</span>
+    <h2>{confirmedBookings}</h2>
+  </div>
+
+  <div className="summary-card">
+    <span>Cancelled Bookings</span>
+    <h2>{cancelledBookings}</h2>
+  </div>
+</div>
 
         <Link to="/" className="explore-button">
           Explore stays
@@ -111,7 +165,7 @@ export default function MyBookings() {
         </div>
       ) : (
         <div className="my-bookings-list">
-          {bookings.map((booking) => (
+          {currentBookings.map((booking) => (
             <article className="my-booking-card" key={booking._id}>
               <img
                 src={booking.listing?.image}
@@ -137,6 +191,25 @@ export default function MyBookings() {
                   {booking.listing?.country}
                 </p>
 
+                <div className="booking-payment-details">
+  <p>
+    <strong>Payment:</strong>{" "}
+    <span className={`payment-status ${booking.paymentStatus}`}>
+      {formatStatus(booking.paymentStatus)}
+    </span>
+  </p>
+
+  {booking.refundStatus &&
+    booking.refundStatus !== "none" && (
+      <p>
+        <strong>Refund:</strong>{" "}
+        <span className={`refund-status ${booking.refundStatus}`}>
+          {formatStatus(booking.refundStatus)}
+        </span>
+      </p>
+    )}
+</div>
+
                 <p>
                   <strong>Check-in:</strong>{" "}
                   {formatDate(booking.checkIn)}
@@ -154,6 +227,38 @@ export default function MyBookings() {
                 <h3>
                   ₹{booking.totalPrice.toLocaleString("en-IN")}
                 </h3>
+                <details className="booking-extra-details">
+  <summary>View booking details</summary>
+
+  <div className="booking-extra-content">
+    <p>
+      <strong>Booking ID:</strong>
+      <span>{booking._id}</span>
+    </p>
+
+    {booking.razorpayPaymentId && (
+      <p>
+        <strong>Payment ID:</strong>
+        <span>{booking.razorpayPaymentId}</span>
+      </p>
+    )}
+
+    {booking.razorpayRefundId && (
+      <p>
+        <strong>Refund ID:</strong>
+        <span>{booking.razorpayRefundId}</span>
+      </p>
+    )}
+
+    {booking.refundStatus &&
+      booking.refundStatus !== "none" && (
+        <p>
+          <strong>Refund Status:</strong>
+          <span>{formatStatus(booking.refundStatus)}</span>
+        </p>
+      )}
+  </div>
+</details>
 
                 <div className="my-booking-actions">
                   {booking.listing?._id && (
@@ -181,7 +286,29 @@ export default function MyBookings() {
             </article>
           ))}
         </div>
+        
       )}
+      {totalPages > 1 && (
+  <div className="pagination">
+    <button
+      disabled={currentPage === 1}
+      onClick={() => setCurrentPage((prev) => prev - 1)}
+    >
+      Previous
+    </button>
+
+    <span>
+      Page {currentPage} of {totalPages}
+    </span>
+
+    <button
+      disabled={currentPage === totalPages}
+      onClick={() => setCurrentPage((prev) => prev + 1)}
+    >
+      Next
+    </button>
+  </div>
+)}
     </main>
   );
 }

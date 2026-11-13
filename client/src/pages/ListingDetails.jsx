@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { getListingById } from "../services/listingService";
-import { createBooking } from "../services/bookingService";
+import { createBooking, verifyBookingPayment } from "../services/bookingService";
 import {
   getReviews,
   createReview,
@@ -120,46 +120,132 @@ export default function ListingDetails() {
   const totalPrice = listing ? nights * listing.price : 0;
 
   // Create booking
-  const handleBooking = async (e) => {
-    e.preventDefault();
-    setBookingError("");
-    setBookingSuccess("");
+ const handleBooking = async (e) => {
+  e.preventDefault();
 
-    if (!isAuthenticated) {
-      navigate("/login");
+  setBookingError("");
+  setBookingSuccess("");
+
+  if (!isAuthenticated) {
+    navigate("/login");
+    return;
+  }
+
+  if (!checkIn || !checkOut || nights <= 0) {
+    setBookingError(
+      "Please select valid check-in and check-out dates."
+    );
+    return;
+  }
+
+  if (!window.Razorpay) {
+    setBookingError(
+      "Payment gateway could not be loaded. Please refresh the page."
+    );
+    return;
+  }
+
+  setBookingLoading(true);
+
+  try {
+    // Step 1: Create pending booking and Razorpay order
+    const response = await createBooking({
+      listingId: id,
+      checkIn,
+      checkOut,
+      guests: Number(guests),
+    });
+
+    if (!response.success) {
+      setBookingError(response.message);
       return;
     }
 
-    if (!checkIn || !checkOut || nights <= 0) {
-      setBookingError("Please select valid check-in and check-out dates.");
-      return;
-    }
+    const orderData = response.data;
 
-    setBookingLoading(true);
+    // Step 2: Configure Razorpay Checkout
+    const options = {
+      key: orderData.keyId,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "WanderLust",
+      description: `Booking for ${listing.title}`,
+      order_id: orderData.orderId,
 
-    try {
-      const response = await createBooking({
-        listingId: id,
-        checkIn,
-        checkOut,
-        guests: Number(guests),
-      });
+      // Step 3: Receive payment response
+      handler: async function (paymentResponse) {
+        setBookingLoading(true);
+        setBookingError("");
 
-      if (response.success) {
-        setBookingSuccess("Your booking has been confirmed!");
-        setCheckIn("");
-        setCheckOut("");
-        setGuests(1);
-      } else {
-        setBookingError(response.message);
-      }
-    } catch (error) {
-      console.error("Booking error:", error);
-      setBookingError("Something went wrong. Please try again.");
-    } finally {
-      setBookingLoading(false);
-    }
-  };
+        try {
+          // Step 4: Verify payment on backend
+          const verificationResponse =
+            await verifyBookingPayment({
+              bookingId: orderData.bookingId,
+              razorpay_order_id:
+                paymentResponse.razorpay_order_id,
+              razorpay_payment_id:
+                paymentResponse.razorpay_payment_id,
+              razorpay_signature:
+                paymentResponse.razorpay_signature,
+            });
+
+          if (verificationResponse.success) {
+            setBookingSuccess(
+              "Payment successful! Your booking is confirmed."
+            );
+
+            setCheckIn("");
+            setCheckOut("");
+            setGuests(1);
+          } else {
+            setBookingError(
+              verificationResponse.message
+            );
+          }
+        } catch (error) {
+          console.error("Verification error:", error);
+          setBookingError(
+            "Payment verification failed. Please contact support before retrying."
+          );
+        } finally {
+          setBookingLoading(false);
+        }
+      },
+
+      modal: {
+        ondismiss: function () {
+          setBookingError(
+            "Payment cancelled. Your booking will remain pending temporarily."
+          );
+        },
+      },
+
+      theme: {
+        color: "#ff385c",
+      },
+    };
+
+    // Step 5: Open Razorpay Checkout
+    const razorpayInstance = new window.Razorpay(options);
+
+    razorpayInstance.on("payment.failed", function (paymentResponse) {
+      setBookingError(
+        paymentResponse.error?.description ||
+          "Payment failed. Please try again."
+      );
+    });
+
+    razorpayInstance.open();
+  } catch (error) {
+    console.error("Booking error:", error);
+    setBookingError(
+      "Something went wrong. Please try again."
+    );
+  } finally {
+    setBookingLoading(false);
+  }
+};
 
   // Submit or update review
   const handleReviewSubmit = async (e) => {

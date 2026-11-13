@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
@@ -39,9 +38,49 @@ const bookingSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["confirmed", "cancelled"],
-      default: "confirmed",
+      enum: ["pending", "confirmed", "cancelled"],
+      default: "pending",
     },
+
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
+    },
+
+    razorpayOrderId: {
+      type: String,
+      default: null,
+    },
+
+    razorpayPaymentId: {
+      type: String,
+      default: null,
+    },
+
+    razorpaySignature: {
+      type: String,
+      default: null,
+    },
+    expiresAt: {
+  type: Date,
+  default: null,
+},
+refundStatus: {
+  type: String,
+  enum: ["none", "initiated", "processed", "failed"],
+  default: "none",
+},
+
+razorpayRefundId: {
+  type: String,
+  default: null,
+},
+
+refundedAt: {
+  type: Date,
+  default: null,
+},
   },
   { timestamps: true }
 );
