@@ -15,9 +15,12 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://airbnb-clone-tawny-xi-76.vercel.app"
+    ],
     credentials: true,
-  }),
+  })
 );
 
 app.use(
