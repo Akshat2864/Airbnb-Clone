@@ -3,7 +3,7 @@ import api from "./api";
 // Register user
 export const registerUser = async (userData) => {
   try {
-    const response = await api.post("/auth/register", userData);
+    const response = await api.post("/api/auth/register", userData);
     return response.data;
   } catch (error) {
     return {
@@ -16,7 +16,7 @@ export const registerUser = async (userData) => {
 // Login user
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post("/auth/login", credentials);
+    const response = await api.post("/api/auth/login", credentials);
     return response.data;
   } catch (error) {
     return {
@@ -29,7 +29,7 @@ export const loginUser = async (credentials) => {
 // Get currently logged-in user
 export const getCurrentUser = async () => {
   try {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/api/auth/me");
     return response.data;
   } catch (error) {
     return {
@@ -43,7 +43,7 @@ export const getCurrentUser = async () => {
 // Logout user
 export const logoutUser = async () => {
   try {
-    const response = await api.post("/auth/logout");
+    const response = await api.post("/api/auth/logout");
     return response.data;
   } catch (error) {
     return {

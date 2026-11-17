@@ -3,7 +3,7 @@ import api from "./api";
 
 export const getReviews = async (listingId) => {
   try {
-    const response = await api.get(`/reviews/${listingId}`);
+    const response = await api.get(`/api/reviews/${listingId}`);
 
     return {
       success: true,
@@ -23,7 +23,7 @@ export const getReviews = async (listingId) => {
 
 export const createReview = async (listingId, reviewData) => {
   try {
-    const response = await api.post(`/reviews/${listingId}`, reviewData);
+    const response = await api.post(`/api/reviews/${listingId}`, reviewData);
 
     return {
       success: true,
@@ -42,7 +42,7 @@ export const createReview = async (listingId, reviewData) => {
 
 export const updateReview = async (reviewId, reviewData) => {
   try {
-    const response = await api.put(`/reviews/${reviewId}`, reviewData);
+    const response = await api.put(`/api/reviews/${reviewId}`, reviewData);
 
     return {
       success: true,
@@ -61,7 +61,7 @@ export const updateReview = async (reviewId, reviewData) => {
 
 export const deleteReview = async (reviewId) => {
   try {
-    const response = await api.delete(`/reviews/${reviewId}`);
+    const response = await api.delete(`/api/reviews/${reviewId}`);
 
     return {
       success: true,

@@ -30,6 +30,8 @@ app.use(
 
 app.use(express.json());
 
+app.set("trust proxy", 1);
+
 app.use(
   session({
     name: "airbnb.sid",
@@ -46,7 +48,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production"?"none":"lax",
       maxAge: 24 * 60 * 60 * 1000,
     },
   }),

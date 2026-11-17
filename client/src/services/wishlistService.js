@@ -3,7 +3,7 @@ import api from "./api";
 
 export const checkWishlist = async (listingId) => {
   try {
-    const response = await api.get(`/wishlist/check/${listingId}`);
+    const response = await api.get(`/api/wishlist/check/${listingId}`);
 
     return {
       success: true,
@@ -21,7 +21,7 @@ export const checkWishlist = async (listingId) => {
 
 export const addToWishlist = async (listingId) => {
   try {
-    const response = await api.post(`/wishlist/${listingId}`);
+    const response = await api.post(`/api/wishlist/${listingId}`);
 
     return {
       success: true,
@@ -39,7 +39,7 @@ export const addToWishlist = async (listingId) => {
 
 export const removeFromWishlist = async (listingId) => {
   try {
-    const response = await api.delete(`/wishlist/${listingId}`);
+    const response = await api.delete(`/api/wishlist/${listingId}`);
 
     return {
       success: true,
@@ -57,7 +57,7 @@ export const removeFromWishlist = async (listingId) => {
 
 export const getMyWishlist = async () => {
   try {
-    const response = await api.get("/wishlist");
+    const response = await api.get("/api/wishlist");
 
     return {
       success: true,

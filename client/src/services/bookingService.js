@@ -3,7 +3,7 @@ import api from "./api";
 
 export const createBooking = async (bookingData) => {
   try {
-    const response = await api.post("/bookings", bookingData);
+    const response = await api.post("/api/bookings", bookingData);
 
     return {
       success: true,
@@ -26,7 +26,7 @@ export const createBooking = async (bookingData) => {
 
 export const getMyBookings = async () => {
   try {
-    const response = await api.get("/bookings/my-bookings");
+    const response = await api.get("/api/bookings/my-bookings");
 
     return {
       success: true,
@@ -49,7 +49,7 @@ export const getMyBookings = async () => {
 export const cancelBooking = async (bookingId) => {
   try {
     const response = await api.patch(
-      `/bookings/${bookingId}/cancel`
+      `/api/bookings/${bookingId}/cancel`
     );
 
     return {
@@ -74,7 +74,7 @@ export const cancelBooking = async (bookingId) => {
 export const verifyBookingPayment = async (paymentData) => {
   try {
     const response = await api.post(
-      "/bookings/verify-payment",
+      "/api/bookings/verify-payment",
       paymentData
     );
 
@@ -101,7 +101,7 @@ export const verifyBookingPayment = async (paymentData) => {
 
 export const getOwnerReservations = async () => {
   try {
-    const response = await api.get("/bookings/owner-reservations");
+    const response = await api.get("/api/bookings/owner-reservations");
     return response.data;
   } catch (error) {
     console.error("Fetch owner reservations error:", error);

@@ -5,7 +5,7 @@ import api from "./api";
 export const uploadImage = async (file) => {
   try {
     // 1. Get temporary ImageKit authentication credentials
-    const authResponse = await api.get("/upload/auth");
+    const authResponse = await api.get("/api/upload/auth");
 
     if (!authResponse.data.success) {
       return {

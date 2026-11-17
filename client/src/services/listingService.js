@@ -5,7 +5,7 @@ import api from "./api";
 
 export const getListings = async () => {
   try {
-    const response = await api.get("/listings");
+    const response = await api.get("/api/listings");
     return response.data.data;
   } catch (error) {
     console.error(
@@ -19,7 +19,7 @@ export const getListings = async () => {
 
 export const getListingById = async (id) => {
   try {
-    const response = await api.get(`/listings/${id}`);
+    const response = await api.get(`/api/listings/${id}`);
     return response.data.data;
   } catch (error) {
     console.error(
@@ -32,7 +32,7 @@ export const getListingById = async (id) => {
 
 export const createListing = async (listingData) => {
   try {
-    const response = await api.post("/listings", listingData);
+    const response = await api.post("/api/listings", listingData);
     return response.data;
   } catch (error) {
     console.error(
@@ -51,7 +51,7 @@ export const createListing = async (listingData) => {
 // Fetch listings created by the logged-in user
 export const getMyListings = async () => {
   try {
-    const response = await api.get("/listings/my-listings");
+    const response = await api.get("/api/listings/my-listings");
     return response.data;
   } catch (error) {
     console.error(
@@ -71,7 +71,7 @@ export const getMyListings = async () => {
 // Update an existing listing
 export const updateListing = async (id, listingData) => {
   try {
-    const response = await api.put(`/listings/${id}`, listingData);
+    const response = await api.put(`/api/listings/${id}`, listingData);
     return response.data;
   } catch (error) {
     console.error(
@@ -89,7 +89,7 @@ export const updateListing = async (id, listingData) => {
 // Delete an existing listing
 export const deleteListing = async (id) => {
   try {
-    const response = await api.delete(`/listings/${id}`);
+    const response = await api.delete(`/api/listings/${id}`);
     return response.data;
   } catch (error) {
     console.error(
