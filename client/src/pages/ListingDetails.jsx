@@ -376,21 +376,33 @@ export default function ListingDetails() {
 
   return (
     <main className="details-container">
-      <Link to="/" className="back-link">
-        ← Back to all stays
-      </Link>
+      
+<div className="property-header">
+  <Link to="/" className="back-link">
+    ← Back to all stays
+  </Link>
 
-      <h1>{listing.title}</h1>
+  <h1>{listing.title}</h1>
 
-      <p className="details-location">
-        {listing.location}, {listing.country}
-      </p>
+  <div className="property-meta">
+    <span>★ {averageRating > 0 ? averageRating.toFixed(1) : "New"}</span>
+    <span>
+      {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+    </span>
+    <span>
+      {listing.location}, {listing.country}
+    </span>
+  </div>
+</div>
 
-      <img
-        className="details-image"
-        src={listing.image}
-        alt={listing.title}
-      />
+<div className="property-gallery">
+  <img
+    className="details-image"
+    src={listing.image}
+    alt={listing.title}
+  />
+</div>
+
 
       <div className="details-layout">
         <section className="details-description">

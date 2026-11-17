@@ -16,6 +16,7 @@ import "./App.css";
 import EditListing from "./pages/EditListing";
 import MyBookings from "./pages/MyBookings";
 import MyWishlist from "./pages/MyWishlist";
+import MyReservations from "./pages/MyReservations";
 
 function Home() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -102,40 +103,54 @@ function Home() {
       <Navbar />
 
       <main className="page-container">
-        <div className="search-row">
-          <input
-            type="search"
-            placeholder="Search destinations or properties"
-            aria-label="Search destinations or properties"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+       
+<div className="search-panel">
+  <div className="search-field destination-field">
+    <label>Where</label>
+    <input
+      type="search"
+      placeholder="Search destinations or properties"
+      aria-label="Search destinations or properties"
+      value={search}
+      onChange={(event) => setSearch(event.target.value)}
+    />
+  </div>
 
-          <input
-            type="number"
-            placeholder="Min price"
-            min="0"
-            value={minPrice}
-            onChange={(event) => setMinPrice(event.target.value)}
-          />
+  <div className="search-field">
+    <label>Minimum price</label>
+    <input
+      type="number"
+      placeholder="₹ Min"
+      min="0"
+      value={minPrice}
+      onChange={(event) => setMinPrice(event.target.value)}
+    />
+  </div>
 
-          <input
-            type="number"
-            placeholder="Max price"
-            min="0"
-            value={maxPrice}
-            onChange={(event) => setMaxPrice(event.target.value)}
-          />
+  <div className="search-field">
+    <label>Maximum price</label>
+    <input
+      type="number"
+      placeholder="₹ Max"
+      min="0"
+      value={maxPrice}
+      onChange={(event) => setMaxPrice(event.target.value)}
+    />
+  </div>
 
-          <select
-            value={sortBy}
-            onChange={(event) => setSortBy(event.target.value)}
-          >
-            <option value="newest">Newest first</option>
-            <option value="low-to-high">Price: Low to High</option>
-            <option value="high-to-low">Price: High to Low</option>
-          </select>
-        </div>
+  <div className="search-field sort-field">
+    <label>Sort by</label>
+    <select
+      value={sortBy}
+      onChange={(event) => setSortBy(event.target.value)}
+    >
+      <option value="newest">Newest first</option>
+      <option value="low-to-high">Price: Low to High</option>
+      <option value="high-to-low">Price: High to Low</option>
+    </select>
+  </div>
+</div>
+
 
         <CategoryFilter
           selected={selectedCategory}
@@ -179,6 +194,7 @@ function App() {
         <Route path="/listings/:id/edit" element={<EditListing />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/my-reservations" element={<MyReservations />} />
         <Route path="/my-wishlist" element={<MyWishlist />} />
       </Route>
     </Routes>

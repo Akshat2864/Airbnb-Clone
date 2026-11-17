@@ -56,6 +56,9 @@ export default function Navbar() {
               <Link to="/my-listings" className="nav-auth-link">
                 My Listings
               </Link>
+              <Link to="/my-reservations" className="nav-auth-link">
+  My Reservations
+</Link>
 
               <Link to="/my-bookings" className="nav-auth-link">
                 My Bookings

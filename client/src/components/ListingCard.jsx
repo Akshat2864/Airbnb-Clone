@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+
 import {
   checkWishlist,
   addToWishlist,
   removeFromWishlist,
 } from "../services/wishlistService";
-import {getReviews } from "../services/reviewService";
+
+import { getReviews } from "../services/reviewService";
 
 export default function ListingCard({ listing }) {
   const navigate = useNavigate();
@@ -15,11 +17,10 @@ export default function ListingCard({ listing }) {
 
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
-
   const [averageRating, setAverageRating] = useState(0);
-const [reviewCount, setReviewCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
 
-  // Check whether this listing is already saved
+  // Fetch wishlist status
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       if (authLoading || !isAuthenticated) {
@@ -27,16 +28,21 @@ const [reviewCount, setReviewCount] = useState(0);
         return;
       }
 
-      const response = await checkWishlist(listing._id);
+      try {
+        const response = await checkWishlist(listing._id);
 
-      if (response.success) {
-        setIsSaved(response.isSaved);
+        if (response.success) {
+          setIsSaved(response.isSaved);
+        }
+      } catch (error) {
+        console.error("Wishlist status error:", error);
       }
     };
 
     fetchWishlistStatus();
   }, [listing._id, isAuthenticated, authLoading]);
 
+  // Toggle wishlist
   const handleFavorite = async () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -64,19 +70,23 @@ const [reviewCount, setReviewCount] = useState(0);
     }
   };
 
-
+  // Fetch review rating
   useEffect(() => {
-  const fetchRating = async () => {
-    const response = await getReviews(listing._id);
+    const fetchRating = async () => {
+      try {
+        const response = await getReviews(listing._id);
 
-    if (response.success) {
-      setAverageRating(response.averageRating);
-      setReviewCount(response.count);
-    }
-  };
+        if (response.success) {
+          setAverageRating(response.averageRating);
+          setReviewCount(response.count);
+        }
+      } catch (error) {
+        console.error("Rating fetch error:", error);
+      }
+    };
 
-  fetchRating();
-}, [listing._id]);
+    fetchRating();
+  }, [listing._id]);
 
   return (
     <article className="listing-card">
@@ -85,12 +95,15 @@ const [reviewCount, setReviewCount] = useState(0);
           <img
             className="listing-image"
             src={listing.image}
-            alt={listing.title}
+            alt={listing.title || "Vacation rental"}
             loading="lazy"
           />
         </Link>
-
-        <span className="guest-favorite">Guest favorite</span>
+        {reviewCount >= 5 && averageRating >= 4.8 && (
+  <span className="guest-favorite">
+    Guest favorite
+  </span>
+)}
 
         <button
           type="button"
@@ -109,12 +122,13 @@ const [reviewCount, setReviewCount] = useState(0);
           <h3>
             {listing.location}, {listing.country}
           </h3>
+
           <span className="listing-rating">
-  ★ {reviewCount > 0 ? averageRating.toFixed(1) : "New"}
-  {reviewCount > 0 && (
-    <small> ({reviewCount})</small>
-  )}
-</span>
+            ★ {reviewCount > 0 ? averageRating.toFixed(1) : "New"}
+            {reviewCount > 0 && (
+              <span className="review-count">({reviewCount})</span>
+            )}
+          </span>
         </div>
 
         <Link
@@ -130,9 +144,9 @@ const [reviewCount, setReviewCount] = useState(0);
 
         <p className="listing-price">
           <strong>
-            ₹{listing.price.toLocaleString("en-IN")}
-          </strong>{" "}
-          night
+            ₹{Number(listing.price).toLocaleString("en-IN")}
+          </strong>
+          <span> night</span>
         </p>
       </div>
     </article>

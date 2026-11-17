@@ -97,3 +97,14 @@ export const verifyBookingPayment = async (paymentData) => {
     };
   }
 };
+
+
+export const getOwnerReservations = async () => {
+  try {
+    const response = await api.get("/bookings/owner-reservations");
+    return response.data;
+  } catch (error) {
+    console.error("Fetch owner reservations error:", error);
+    throw error;
+  }
+};

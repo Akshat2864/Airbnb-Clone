@@ -244,16 +244,7 @@ router.post("/verify-payment", isAuthenticated, async (req, res) => {
       });
     }
 
-    if (booking.expiresAt && booking.expiresAt <= new Date()) {
-      booking.status = "cancelled";
-      booking.paymentStatus = "failed";
-      await booking.save();
 
-      return res.status(400).json({
-        success: false,
-        message: "Booking payment window has expired",
-      });
-    }
 
     // Generate expected Razorpay signature
     const expectedSignature = crypto
@@ -291,6 +282,50 @@ router.post("/verify-payment", isAuthenticated, async (req, res) => {
         message: "Payment is not successfully captured",
       });
     }
+
+
+// Handle payment captured after booking expiry
+if (booking.expiresAt && booking.expiresAt <= new Date()) {
+  // Save the captured payment details
+  booking.razorpayPaymentId = razorpay_payment_id;
+  booking.razorpaySignature = razorpay_signature;
+  booking.status = "cancelled";
+  booking.paymentStatus = "paid";
+
+  // Automatically initiate a full refund
+  const refund = await razorpay.payments.refund(
+    razorpay_payment_id,
+    {
+      amount: payment.amount,
+      speed: "normal",
+      notes: {
+        bookingId: booking._id.toString(),
+        reason: "Payment captured after booking expiry",
+      },
+    }
+  );
+
+  booking.razorpayRefundId = refund.id;
+  booking.refundStatus =
+    refund.status === "processed" ? "processed" : "initiated";
+
+  if (refund.status === "processed") {
+    booking.paymentStatus = "refunded";
+    booking.refundedAt = new Date();
+  }
+
+  await booking.save();
+
+  return res.status(200).json({
+    success: true,
+    message:
+      booking.paymentStatus === "refunded"
+        ? "Booking expired. Payment refunded successfully."
+        : "Booking expired. Refund has been initiated.",
+    data: booking,
+  });
+}
+
 
     // Confirm booking only after successful verification
     booking.status = "confirmed";
@@ -337,6 +372,46 @@ router.get("/my-bookings", isAuthenticated, async (req, res) => {
     });
   }
 });
+
+
+// GET /api/bookings/owner-reservations
+router.get(
+  "/owner-reservations",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      // Find properties owned by the logged-in user
+      const listings = await Listing.find({
+        owner: req.session.userId,
+      }).select("_id");
+
+      const listingIds = listings.map(
+        (listing) => listing._id
+      );
+
+      // Find bookings made for those properties
+      const bookings = await Booking.find({
+        listing: { $in: listingIds },
+      })
+        .populate("listing")
+        .populate("user", "name email")
+        .sort({ createdAt: -1 });
+
+      return res.status(200).json({
+        success: true,
+        count: bookings.length,
+        data: bookings,
+      });
+    } catch (error) {
+      console.error("Fetch owner reservations error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch reservations",
+      });
+    }
+  }
+);
 
 
 
