@@ -35,7 +35,7 @@ export default function Navbar() {
     <header className="navbar">
       <Link to="/" className="brand">
         <span className="brand-icon">⌂</span>
-        <span>airbnb</span>
+        <span>WanderLust</span>
       </Link>
 
       <div className="nav-center">

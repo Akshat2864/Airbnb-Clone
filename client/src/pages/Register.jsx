@@ -51,8 +51,8 @@ export default function Register() {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Create an account</h2>
-        <p>Join us and discover amazing stays.</p>
+<h2>Join WanderLust</h2>
+<p>Create your account and discover amazing places to stay.</p>
 
         {error && <div className="auth-error">{error}</div>}
 

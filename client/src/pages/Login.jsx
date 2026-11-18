@@ -50,7 +50,7 @@ export default function Login() {
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
         <h2>Welcome back</h2>
-        <p>Login to your Airbnb account</p>
+        <p>Welcome back to WanderLust. Sign in to manage your stays.</p>
 
         {error && <div className="auth-error">{error}</div>}
 
