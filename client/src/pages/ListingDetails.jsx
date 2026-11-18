@@ -168,7 +168,7 @@ export default function ListingDetails() {
       key: orderData.keyId,
       amount: orderData.amount,
       currency: orderData.currency,
-      name: "AirBnb Clone",
+      name: "WanderLust",
       description: `Booking for ${listing.title}`,
       order_id: orderData.orderId,
 
