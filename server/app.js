@@ -67,7 +67,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
-  res.json({ message: "Airbnb Clone API is running!" });
+  res.json({ message: "WanderLust API is running!" });
 });
 
 const PORT = process.env.PORT || 5000;
