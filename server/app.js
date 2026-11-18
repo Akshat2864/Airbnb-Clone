@@ -34,7 +34,7 @@ app.set("trust proxy", 1);
 
 app.use(
   session({
-    name: "airbnb.sid",
+    name: "wanderlust.sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

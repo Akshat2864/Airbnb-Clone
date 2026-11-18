@@ -195,7 +195,7 @@ router.post("/logout", (req, res) => {
       }
 
       // Clear the session cookie from the browser
-      res.clearCookie("airbnb.sid", {
+      res.clearCookie("wanderlust.sid", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
